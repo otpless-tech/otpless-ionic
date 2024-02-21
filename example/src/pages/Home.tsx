@@ -27,7 +27,13 @@ const Home: React.FC = () => {
   }
 
   const openLoginPage = async() => {
-    const data = await manager.showOtplessLoginPage();
+    let params = {
+      'method': 'get',
+      'params': {
+        'name': 'otplesstext'
+      }
+    };
+    const data = await manager.showOtplessLoginPage(params);
     handleResult(data);
   }
 
