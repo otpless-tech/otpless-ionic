@@ -6,21 +6,6 @@ const OtplessInstance = registerPlugin<OtplessPlugin>('OtplessPlugin',);
 
 class OtplessManager {
 
-  async start(jsonParams: any | null = null) {
-    await OtplessInstance.start({ "jsonParams": jsonParams });
-  }
-
-  async startWithCallback(jsonParams: any | null = null) {
-    return  await OtplessInstance.startWithCallback({ "jsonParams": jsonParams });
-  }
-  async onSignInCompleted() {
-    await OtplessInstance.onSignInCompleted();
-  }
-
-  async showFabButton(isShowFab: boolean) {
-    await OtplessInstance.showFabButton({ isShowFab: isShowFab });
-  }
-
   // to open the otpless login page
   async showOtplessLoginPage(jsonParams: any | null = null) {
     return await OtplessInstance.showOtplessLoginPage({ "jsonParams": jsonParams });
@@ -30,6 +15,11 @@ class OtplessManager {
   async isWhatsappInstalled() {
     const {hasWhatsapp} = await OtplessInstance.isWhatsappInstalled();
     return hasWhatsapp;
+  }
+
+  // set visibility of native loader
+  async setLoaderVisibility(visibility: boolean) {
+    await OtplessInstance.setLoaderVisibility({ visibility: visibility });
   }
 }
 

@@ -15,16 +15,7 @@ const Home: React.FC = () => {
     handleResult(result);
     });
 
-  const openWithCallback = async () => {
-    let params = {
-      'method': 'get',
-      'params': {
-        'ux_mode': 'auto_clicked'
-      }
-    };
-    const data = await manager.startWithCallback(params);
-    handleResult(data);
-  }
+  var loaderVisibility = true;
 
   const openLoginPage = async() => {
     let params = {
@@ -42,24 +33,6 @@ const Home: React.FC = () => {
     setResult("whatsapp: " + hasWhatsapp);
   }
 
-  const openWithEvent = async () => {
-    let params = {
-      'method': 'get',
-      'params': {
-        'isSpecialClient': 'true'
-      }
-    };
-    manager.start(params);
-  }
-
-  const afterSigninCompleted = async () => {
-    await manager.onSignInCompleted();
-  }
-
-  const hideSignInButton = async () => {
-    await manager.showFabButton(false);
-  }
-
   const handleResult = (data: any) => {
     let message: string = '';
     if (data.data === null || data.data === undefined) {
@@ -69,6 +42,11 @@ const Home: React.FC = () => {
     }
     setResult(message);
   };
+
+  const toggleLoaderVisibility = async() => {
+      loaderVisibility = !loaderVisibility;
+      await manager.set
+  }
 
   return (
     <IonPage>
@@ -92,7 +70,7 @@ const Home: React.FC = () => {
         <IonButton style={{ "marginTop": "16px" }} onClick={() => hideSignInButton()}>Hide Signin Button</IonButton>
 
         <IonButton style={{ "marginTop": "16px" }} onClick={() => openLoginPage()}>Show Login Page</IonButton>
-
+        <IonButton style={{ "marginTop": "16px" }} onClick={() => afterSigninCompleted()}>Toggle Loader Visibility</IonButton>
         <IonButton style={{ "marginTop": "16px" }} onClick={() => checkWhatsappApp()}>Check Whatsapp</IonButton>
 
         <ExploreContainer />
