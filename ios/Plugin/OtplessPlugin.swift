@@ -12,45 +12,6 @@ public class OtplessPlugin: CAPPlugin, onResponseDelegate {
     
     private var pluginCallWrap: CapPluginCallWrapper? = nil
     
-    @objc func start(_ call: CAPPluginCall) {
-        let jsObject = call.getObject("jsonParams")
-        DispatchQueue.main.async {
-            let viewController = UIApplication.shared.delegate?.window??.rootViewController
-            Otpless.sharedInstance.delegate = self
-            if let param = jsObject {
-                Otpless.sharedInstance.startwithParams(vc: viewController!, params: param)
-            } else {
-                Otpless.sharedInstance.start(vc: viewController!)
-            }
-        }
-        call.resolve()
-    }
-    
-    @objc func startWithCallback(_ call: CAPPluginCall) {
-        let jsObject = call.getObject("jsonParams")
-        Otpless.sharedInstance.shouldHideButton(hide: true)
-        DispatchQueue.main.async {
-            let viewController = UIApplication.shared.delegate?.window??.rootViewController
-            self.pluginCallWrap = CapPluginCallWrapper(pluginCall: call)
-            Otpless.sharedInstance.delegate = self.pluginCallWrap!
-            if let param = jsObject {
-                Otpless.sharedInstance.startwithParams(vc: viewController!, params: param)
-            } else {
-                Otpless.sharedInstance.start(vc: viewController!)
-            }
-        }
-    }
-    
-    @objc func onSignInCompleted(_ call: CAPPluginCall) {
-        DispatchQueue.main.async {
-            Otpless.sharedInstance.onSignedInComplete()
-        }
-    }
-    
-    @objc func showFabButton(_ call: CAPPluginCall) {
-        let isToShow = call.getBool("isShowFab") ?? true
-        Otpless.sharedInstance.shouldHideButton(hide: !isToShow)
-    }
     
     public func onResponse(response: OtplessResponse?) {
         var result: JSObject = JSObject()
@@ -62,17 +23,14 @@ public class OtplessPlugin: CAPPlugin, onResponseDelegate {
     }
     
     @objc func showOtplessLoginPage(_ call: CAPPluginCall) {
-        let jsObject = call.getObject("jsonParams")
-        Otpless.sharedInstance.shouldHideButton(hide: true)
+        let jsObject: JSObject = call.getObject("jsonParams")!
+        let appId = jsObject["appId"] as! String
+        let params = jsObject["params"] as? JSObject
         DispatchQueue.main.async {
             let viewController = UIApplication.shared.delegate?.window??.rootViewController
             self.pluginCallWrap = CapPluginCallWrapper(pluginCall: call)
             Otpless.sharedInstance.delegate = self.pluginCallWrap!
-            if let param = jsObject {
-                Otpless.sharedInstance.showOtplessLoginPageWithParams(vc: viewController!, params: param)
-            } else {
-                Otpless.sharedInstance.showOtplessLoginPage(vc: viewController!)
-            }
+            Otpless.sharedInstance.showOtplessLoginPageWithParams(appId: appId, vc: viewController!, params: params)
         }
     }
     
@@ -81,6 +39,10 @@ public class OtplessPlugin: CAPPlugin, onResponseDelegate {
         var result: JSObject = JSObject()
         result["hasWhatsapp"] = hasWhatsapp
         call.resolve(result)
+    }
+    
+    @objc func setLoaderVisibility(_ call: CAPPluginCall) {
+        // to be implemented
     }
 }
 

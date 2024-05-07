@@ -1,5 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
+import { IonButton, IonContent, IonHeader, IonPage, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
 import './Home.css';
 import { OtplessManager, OtplessInstance } from 'otpless-ionic';
 import { useState } from 'react';
@@ -18,13 +17,8 @@ const Home: React.FC = () => {
   var loaderVisibility = true;
 
   const openLoginPage = async() => {
-    let params = {
-      'method': 'get',
-      'params': {
-        'name': 'otplesstext'
-      }
-    };
-    const data = await manager.showOtplessLoginPage(params);
+    let jsonParams = {appId: "5e62zcanetd9urnxpz80"}
+    const data = await manager.showOtplessLoginPage(jsonParams);
     handleResult(data);
   }
 
@@ -34,46 +28,24 @@ const Home: React.FC = () => {
   }
 
   const handleResult = (data: any) => {
-    let message: string = '';
-    if (data.data === null || data.data === undefined) {
-      message = data.errorMessage;
-    } else {
-      message = `token: ${data.data.token}`;
-    }
+    let message: string = JSON.stringify(data);
+    console.log(message);
     setResult(message);
   };
 
   const toggleLoaderVisibility = async() => {
-      loaderVisibility = !loaderVisibility;
-      await manager.set
+    loaderVisibility = !loaderVisibility;
+    await manager.setLoaderVisibility(loaderVisibility);
   }
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Otpless IONIC Sample</IonTitle>
-        </IonToolbar>
-      </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Blank</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
-        <IonTitle style={{ "marginTop": "16px" }}>{result}</IonTitle>
-
-        <IonButton onClick={() => openWithEvent()}>Open With Event</IonButton>
-        <IonButton onClick={() => openWithCallback()}>Open With Callback</IonButton>
-        <IonButton style={{ "marginTop": "16px" }} onClick={() => afterSigninCompleted()}>After SignIn Completed</IonButton>
-        <IonButton style={{ "marginTop": "16px" }} onClick={() => hideSignInButton()}>Hide Signin Button</IonButton>
-
+        <IonTitle style={{ "marginTop": "16px" }}>Otpless Ionic Sample</IonTitle>
         <IonButton style={{ "marginTop": "16px" }} onClick={() => openLoginPage()}>Show Login Page</IonButton>
-        <IonButton style={{ "marginTop": "16px" }} onClick={() => afterSigninCompleted()}>Toggle Loader Visibility</IonButton>
+        <IonButton style={{ "marginTop": "16px" }} onClick={() => toggleLoaderVisibility()}>Toggle Loader Visibility</IonButton>
         <IonButton style={{ "marginTop": "16px" }} onClick={() => checkWhatsappApp()}>Check Whatsapp</IonButton>
-
-        <ExploreContainer />
+        <IonTextarea autoGrow style={{ "marginTop": "16px" }}>{result}</IonTextarea>
       </IonContent>
     </IonPage>
   );

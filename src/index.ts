@@ -7,7 +7,7 @@ const OtplessInstance = registerPlugin<OtplessPlugin>('OtplessPlugin',);
 class OtplessManager {
 
   // to open the otpless login page
-  async showOtplessLoginPage(jsonParams: any | null = null) {
+  async showOtplessLoginPage(jsonParams: any) {
     return await OtplessInstance.showOtplessLoginPage({ "jsonParams": jsonParams });
   }
 
