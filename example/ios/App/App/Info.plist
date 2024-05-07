@@ -7,7 +7,7 @@
       <dict>
        <key>CFBundleURLSchemes</key>
        <array>
-        <string>$(PRODUCT_BUNDLE_IDENTIFIER).otpless</string>
+        <string>otpless.5e62zcanetd9urnxpz80</string>
        </array>
        <key>CFBundleTypeRole</key>
        <string>Editor</string>
