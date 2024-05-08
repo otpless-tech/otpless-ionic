@@ -17,7 +17,7 @@ const Home: React.FC = () => {
   var loaderVisibility = true;
 
   const openLoginPage = async() => {
-    let jsonParams = {appId: "5e62zcanetd9urnxpz80"}
+    let jsonParams = {appId: "APP_ID"}
     const data = await manager.showOtplessLoginPage(jsonParams);
     handleResult(data);
   }
