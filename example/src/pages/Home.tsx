@@ -1,6 +1,7 @@
 import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput } from '@ionic/react';
 import './Home.css';
-import { OtplessManager } from 'otpless-ionic';
+
+import {OtplessManager} from 'otpless-ionic';
 import { useEffect, useState } from 'react';
 
 
@@ -9,7 +10,7 @@ const Home: React.FC = () => {
   let manager = new OtplessManager()
 
   useEffect(() => {
-    manager.initHeadless("5E62ZCANETD9URNXPZ80")
+    manager.initHeadless("YYTFDI0602X3O5T5SIS5")
     manager.setHeadlessCallback(onHeadlessResult)
     return () => {
       manager.clearListener();
@@ -23,17 +24,18 @@ const Home: React.FC = () => {
     channelType: '',
   })
 
-  const handleChange = (fieldName: string, value: string) => {
+  const handleChange = (fieldName: string, value: any) => {
+    console.log("changing: " + fieldName + " with value: " + value );
     setForm((prevForm) => ({
       ...prevForm, // Keep existing fields
       [fieldName]: value, // Update the specific field
     }));
-  };
+  }
 
   var loaderVisibility = true;
 
   const openLoginPage = async() => {
-    let jsonParams = {appId: "5E62ZCANETD9URNXPZ80"}
+    let jsonParams = {appId: "YYTFDI0602X3O5T5SIS5"}
     const data = await manager.showOtplessLoginPage(jsonParams);
     handleResult(data);
   }
@@ -62,6 +64,7 @@ const Home: React.FC = () => {
   }
 
   const startHeadless = async () => {
+    console.log("calling start otpless");
     let headlessRequest = {}
     let phoneNumber = form.phoneNumber;
     if (phoneNumber != null && phoneNumber.length != 0) {
@@ -106,10 +109,10 @@ const Home: React.FC = () => {
         <IonButton style={{ "marginTop": "16px" }} onClick={() => toggleLoaderVisibility()}>Toggle Loader Visibility</IonButton>
         <IonButton style={{ "marginTop": "16px" }} onClick={() => checkWhatsappApp()}>Check Whatsapp</IonButton>
 
-        {/* <IonItem>
+        <IonItem>
           <IonInput
             value={form.phoneNumber}
-            onIonChange={(e) => handleChange('phoneNumber', e.detail.value!)}  // Update state when text changes
+            onIonChange={(e) => handleChange('phoneNumber', e.target.value)}  // Update state when text changes
             placeholder="Enter Phone or mobile"
           />
         </IonItem>
@@ -117,7 +120,7 @@ const Home: React.FC = () => {
         <IonItem>
           <IonInput
             value={form.otp}
-            onIonChange={(e) => handleChange('otp', e.detail.value!)}  // Update state when text changes
+            onIonChange={(e) => handleChange('otp', e.target.value!)}  // Update state when text changes
             placeholder="Enter OTP"
           />
         </IonItem>
@@ -125,12 +128,12 @@ const Home: React.FC = () => {
         <IonItem>
           <IonInput
             value={form.channelType}
-            onIonChange={(e) => handleChange('channelType', e.detail.value!)}  // Update state when text changes
+            onIonChange={(e) => handleChange('channelType', e.target.value!)}  // Update state when text changes
             placeholder="Enter Channel Type"
           />
-        </IonItem> */}
+        </IonItem>
 
-        {/* <IonButton style={{ "marginTop": "16px" }} onClick={() => startHeadless()}>Start Headless</IonButton> */}
+        <IonButton style={{ "marginTop": "16px" }} onClick={() => startHeadless()}>Start Headless</IonButton>
 
         <IonTextarea autoGrow style={{ "marginTop": "16px" }}>{form.result}</IonTextarea>
       </IonContent>

@@ -95,7 +95,10 @@ public class OtplessPlugin extends Plugin {
      */
     @PluginMethod
     public void showOtplessLoginPage(PluginCall call) {
-        if (!checkOrInitOtpless(getActivity())) return;
+        if (!checkOrInitOtpless(getActivity())) {
+            call.resolve();
+            return;
+        }
         final JSObject obj = call.getObject("jsonParams");
         final String appId = obj.optString("appId", "");
         final OtplessRequest request = new OtplessRequest(appId);
@@ -115,7 +118,6 @@ public class OtplessPlugin extends Plugin {
                 final String value = params.getString(key);
                 if (value == null) continue;
                 request.addExtras(key, value);
-
             }
         }
         onMainThread(() ->
@@ -154,7 +156,10 @@ public class OtplessPlugin extends Plugin {
 
     @PluginMethod
     public void enableOneTap(PluginCall call) {
-        if (!checkOrInitOtpless(getActivity())) return;
+        if (!checkOrInitOtpless(getActivity())) {
+            call.resolve();
+            return;
+        }
         Boolean isOnetap = call.getBoolean("isOnetap", true);
         isOnetap = isOnetap == null || isOnetap;
         otplessView.enableOneTap(isOnetap);
@@ -163,7 +168,10 @@ public class OtplessPlugin extends Plugin {
 
     @PluginMethod
     public void initHeadless(PluginCall call) {
-        if (!checkOrInitOtpless(getActivity())) return;
+        if (!checkOrInitOtpless(getActivity())) {
+            call.resolve();
+            return;
+        }
         String appId = call.getString("appId", "");
         onMainThread(() -> {
             otplessView.initHeadless(appId, null);
@@ -173,14 +181,20 @@ public class OtplessPlugin extends Plugin {
 
     @PluginMethod
     public void setHeadlessCallback(PluginCall call) {
-        if (!checkOrInitOtpless(getActivity())) return;
+        if (!checkOrInitOtpless(getActivity())) {
+            call.resolve();
+            return;
+        }
         otplessView.setHeadlessCallback(this::onHeadlessResponse);
         call.resolve();
     }
 
     @PluginMethod
     public void startHeadless(PluginCall call) throws Exception {
-        if (!checkOrInitOtpless(getActivity())) return;
+        if (!checkOrInitOtpless(getActivity())) {
+            call.resolve();
+            return;
+        }
         // creating headless request
         final JSObject jsRequest = call.getObject("request");
         if (jsRequest == null) throw new Exception("Headless request is missing");
