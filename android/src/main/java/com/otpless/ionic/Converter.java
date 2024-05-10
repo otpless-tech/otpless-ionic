@@ -1,6 +1,7 @@
 package com.otpless.ionic;
 
 import com.getcapacitor.JSObject;
+import com.otpless.dto.HeadlessResponse;
 import com.otpless.dto.OtplessResponse;
 
 import org.json.JSONException;
@@ -23,5 +24,13 @@ public class Converter {
             obj.put("errorMessage", errorMessage);
             return obj;
         }
+    }
+
+    public static JSObject fromHeadlessResponseToJson(final HeadlessResponse headlessResponse) {
+        return new JSObject()
+                .put("responseType", headlessResponse.getResponseType())
+                .put("statusCode", headlessResponse.getStatusCode())
+                .put("response", headlessResponse.getResponse());
+
     }
 }

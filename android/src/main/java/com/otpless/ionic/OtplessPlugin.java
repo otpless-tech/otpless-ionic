@@ -14,7 +14,10 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginHandle;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.otpless.dto.HeadlessRequest;
+import com.otpless.dto.HeadlessResponse;
 import com.otpless.dto.OtplessRequest;
+import com.otpless.main.HeadlessResponseCallback;
 import com.otpless.main.OtplessManager;
 import com.otpless.main.OtplessView;
 import com.otpless.utils.Utility;
@@ -144,8 +147,86 @@ public class OtplessPlugin extends Plugin {
         return otplessView.onBackPressed();
     }
 
+    @PluginMethod
+    public void setWebViewInspectable(PluginCall call) {
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void enableOneTap(PluginCall call) {
+        if (!checkOrInitOtpless(getActivity())) return;
+        Boolean isOnetap = call.getBoolean("isOnetap", true);
+        isOnetap = isOnetap == null || isOnetap;
+        otplessView.enableOneTap(isOnetap);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void initHeadless(PluginCall call) {
+        if (!checkOrInitOtpless(getActivity())) return;
+        String appId = call.getString("appId", "");
+        onMainThread(() -> {
+            otplessView.initHeadless(appId, null);
+        });
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void setHeadlessCallback(PluginCall call) {
+        if (!checkOrInitOtpless(getActivity())) return;
+        otplessView.setHeadlessCallback(this::onHeadlessResponse);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void startHeadless(PluginCall call) throws Exception {
+        if (!checkOrInitOtpless(getActivity())) return;
+        // creating headless request
+        final JSObject jsRequest = call.getObject("request");
+        if (jsRequest == null) throw new Exception("Headless request is missing");
+        onMainThread(() -> {
+            otplessView.startHeadless(makeHeadlessRequest(jsRequest), this::onHeadlessResponse);
+        });
+        call.resolve();
+    }
+
+    private HeadlessRequest makeHeadlessRequest(final JSObject jsRequest) {
+        final HeadlessRequest headlessRequest = new HeadlessRequest();
+        final String phone = jsRequest.optString("phone", "");
+        // first check for phone number case
+        if (!phone.isEmpty()) {
+            final String countryCode = jsRequest.optString("countryCode", "");
+            headlessRequest.setPhoneNumber(countryCode, phone);
+            final String otp = jsRequest.optString("otp", "");
+            // check otp with phone number
+            if (!otp.isEmpty()) {
+                headlessRequest.setOtp(otp);
+            }
+        } else {
+            // check for email case
+            final String email = jsRequest.optString("email", "");
+            if (!email.isEmpty()) {
+                headlessRequest.setEmail(email);
+                final String otp = jsRequest.optString("otp", "");
+                // check otp with email
+                if (!otp.isEmpty()) {
+                    headlessRequest.setOtp(otp);
+                }
+            } else {
+                // last case is oauth case
+                final String channelType = jsRequest.optString("channelType", "");
+                headlessRequest.setChannelType(channelType);
+            }
+        }
+        return headlessRequest;
+    }
+
     private void onMainThread(final Runnable callback) {
         if (getActivity() == null) return;
         getActivity().runOnUiThread(callback);
+    }
+
+    private void onHeadlessResponse(@NonNull HeadlessResponse headlessResponse) {
+        notifyListeners("OtplessResultEvent", Converter.fromHeadlessResponseToJson(headlessResponse));
     }
 }

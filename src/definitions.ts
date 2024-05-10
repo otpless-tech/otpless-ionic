@@ -7,4 +7,15 @@ export interface OtplessPlugin extends Plugin {
   isWhatsappInstalled(): Promise<{ hasWhatsapp: string }>;
   // setting visibility of native loader
   setLoaderVisibility(option: {visibility: boolean}): Promise<void>;
+  // to enable and disble the webview inspection
+  setWebViewInspectable(option: {isInspectable: boolean}): Promise<void>;
+  // to enable and disable onetap option
+  enableOneTap(option: {isOnetap: boolean}): Promise<void>;
+
+  // to initialize headless
+  initHeadless(option: {appId: String}): Promise<void>;
+  // to set headless callback
+  setHeadlessCallback(): Promise<void>;
+  // to start headless sdk
+  startHeadless(option: {request: any}): Promise<void>;
 }

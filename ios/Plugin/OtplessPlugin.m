@@ -7,4 +7,11 @@ CAP_PLUGIN(OtplessPlugin, "OtplessPlugin",
            CAP_PLUGIN_METHOD(showOtplessLoginPage, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(isWhatsappInstalled, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(setLoaderVisibility, CAPPluginReturnPromise);
+           
+           CAP_PLUGIN_METHOD(setWebViewInspectable, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(enableOneTap, CAPPluginReturnPromise);
+           
+           CAP_PLUGIN_METHOD(initHeadless, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(setHeadlessCallback, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(startHeadless, CAPPluginReturnPromise);
 )

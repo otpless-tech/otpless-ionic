@@ -8,19 +8,9 @@ import OtplessSDK
  * here: https://capacitorjs.com/docs/plugins/ios
  */
 @objc(OtplessPlugin)
-public class OtplessPlugin: CAPPlugin, onResponseDelegate {
-    
+public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
+   
     private var pluginCallWrap: CapPluginCallWrapper? = nil
-    
-    
-    public func onResponse(response: OtplessResponse?) {
-        var result: JSObject = JSObject()
-        result["errorMessage"] = response?.errorString
-        if let data = response?.responseData {
-            result["data"] = anyDictToJsObjDict(input: data)
-        }
-        notifyListeners("OtplessResultEvent", data: result)
-    }
     
     @objc func showOtplessLoginPage(_ call: CAPPluginCall) {
         let jsObject: JSObject = call.getObject("jsonParams")!
@@ -44,6 +34,70 @@ public class OtplessPlugin: CAPPlugin, onResponseDelegate {
     @objc func setLoaderVisibility(_ call: CAPPluginCall) {
         // to be implemented
     }
+    
+    @objc func setWebViewInspectable(_ call: CAPPluginCall) {
+        let isInspectable = call.getBool("isInspectable", false)
+        Otpless.sharedInstance.webviewInspectable = isInspectable
+        call.resolve()
+    }
+    
+    @objc func enableOneTap(_ call: CAPPluginCall) {
+        let isOnetap = call.getBool("isOnetap", true)
+        Otpless.sharedInstance.setOneTapEnabled(isOnetap)
+        call.resolve()
+    }
+    
+    @objc func initHeadless(_ call: CAPPluginCall) {
+        let appId = call.getString("appId", "")
+        DispatchQueue.main.async {
+            let viewController = UIApplication.shared.delegate?.window??.rootViewController
+            Otpless.sharedInstance.initialise(vc: viewController!, appId: appId)
+        }
+    }
+    
+    @objc func setHeadlessCallback(_ call: CAPPluginCall) {
+        Otpless.sharedInstance.headlessDelegate = self
+    }
+    
+    @objc func startHeadless(_ call: CAPPluginCall) {
+        let jsRequest: JSObject = call.getObject("request")!
+        let viewController = UIApplication.shared.delegate?.window??.rootViewController
+        let headlessRequest = makeHeadlessRequest(jsRequest: jsRequest)
+        DispatchQueue.main.async {
+            if let otp = jsRequest["otp"] {
+                Otpless.sharedInstance.verifyOTP(otp: otp as! String, headlessRequest: headlessRequest)
+            } else {
+                Otpless.sharedInstance.startHeadless(headlessRequest: headlessRequest)
+            }
+        }
+    }
+    
+    private func makeHeadlessRequest(jsRequest: JSObject) -> HeadlessRequest {
+        let headlessRequest = HeadlessRequest()
+        if let phone = jsRequest["phone"] {
+            let countryCode = jsRequest["countryCode"]
+            headlessRequest.setPhoneNumber(number: phone as! String, withCountryCode: countryCode as! String)
+        } else if let email = jsRequest["email"] {
+            headlessRequest.setEmail(email as! String)
+        } else {
+            headlessRequest.setChannelType(jsRequest["channelType"] as! String)
+        }
+        return headlessRequest;
+    }
+    
+    public func onHeadlessResponse(response: OtplessSDK.HeadlessResponse?) {
+        if response == nil {
+            return
+        }
+        var result: JSObject = JSObject()
+        result["statusCode"] = response!.statusCode
+        result["responseType"] = response!.responseType
+        if let data = response!.responseData {
+            result["response"] = anyDictToJsObjDict(input: data)
+        }
+        notifyListeners("OtplessResultEvent", data: result)
+    }
+    
 }
 
 class CapPluginCallWrapper: onResponseDelegate {
