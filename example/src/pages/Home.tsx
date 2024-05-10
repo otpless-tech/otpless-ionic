@@ -10,7 +10,7 @@ const Home: React.FC = () => {
   let manager = new OtplessManager()
 
   useEffect(() => {
-    manager.initHeadless("YYTFDI0602X3O5T5SIS5")
+    manager.initHeadless("5E62ZCANETD9URNXPZ80")
     manager.setHeadlessCallback(onHeadlessResult)
     return () => {
       manager.clearListener();
@@ -35,7 +35,7 @@ const Home: React.FC = () => {
   var loaderVisibility = true;
 
   const openLoginPage = async() => {
-    let jsonParams = {appId: "YYTFDI0602X3O5T5SIS5"}
+    let jsonParams = {appId: "5E62ZCANETD9URNXPZ80"}
     const data = await manager.showOtplessLoginPage(jsonParams);
     handleResult(data);
   }
