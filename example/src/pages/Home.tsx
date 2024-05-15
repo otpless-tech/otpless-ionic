@@ -12,6 +12,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     manager.initHeadless("5E62ZCANETD9URNXPZ80")
     manager.setHeadlessCallback(onHeadlessResult)
+    manager.setWebViewInspectable(true);
     return () => {
       manager.clearListener();
     }

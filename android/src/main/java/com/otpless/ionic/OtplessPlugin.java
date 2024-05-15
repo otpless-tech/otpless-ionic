@@ -17,7 +17,6 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.otpless.dto.HeadlessRequest;
 import com.otpless.dto.HeadlessResponse;
 import com.otpless.dto.OtplessRequest;
-import com.otpless.main.HeadlessResponseCallback;
 import com.otpless.main.OtplessManager;
 import com.otpless.main.OtplessView;
 import com.otpless.utils.Utility;
