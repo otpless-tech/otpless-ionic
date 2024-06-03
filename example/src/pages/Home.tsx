@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput } from '@ionic/react';
+import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput, isPlatform } from '@ionic/react';
 import './Home.css';
 
 import {OtplessManager} from 'otpless-ionic';
@@ -8,10 +8,15 @@ import { useEffect, useState } from 'react';
 const Home: React.FC = () => {
 
   let manager = new OtplessManager()
+  let isIosHeadlessInit = false;
 
   useEffect(() => {
-    manager.initHeadless("APP_ID")
-    manager.setHeadlessCallback(onHeadlessResult)
+    if(isPlatform('android')) {
+      manager.initHeadless("5E62ZCANETD9URNXPZ80");
+      manager.setHeadlessCallback(onHeadlessResult);
+      console.log("Otpless: android headless init done");
+    }
+    manager.setWebViewInspectable(false);
     return () => {
       manager.clearListener();
     }
@@ -35,7 +40,7 @@ const Home: React.FC = () => {
   var loaderVisibility = true;
 
   const openLoginPage = async() => {
-    let jsonParams = {appId: "APP_ID"}
+    let jsonParams = {appId: "5E62ZCANETD9URNXPZ80"}
     const data = await manager.showOtplessLoginPage(jsonParams);
     handleResult(data);
   }
@@ -64,6 +69,13 @@ const Home: React.FC = () => {
   }
 
   const startHeadless = async () => {
+    if(isPlatform('ios') && !isIosHeadlessInit) {
+      manager.initHeadless("5E62ZCANETD9URNXPZ80");
+      manager.setHeadlessCallback(onHeadlessResult);
+      console.log("Otpless: ios headless init done");
+      isIosHeadlessInit = true;
+      return;
+    }
     console.log("calling start otpless");
     let headlessRequest = {}
     let phoneNumber = form.phoneNumber;
