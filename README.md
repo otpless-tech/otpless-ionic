@@ -10,91 +10,29 @@ npx cap sync
 ```
 <br><br>
 
-## API
+## Login Page API
 <br>
 
 ### IONIC
-* Import the OtplessManager and OtplessInstance
+#### Import the OtplessManager
 
 ```
-import { OtplessManager, OtplessInstance } from 'otpless-ionic';
+import {OtplessManager} from 'otpless-ionic';
 ```
 
 <br>
 
-* In your login component create the instance of OtplessManager, remove the existing listeners and add new listener callback.
-Removing and adding listeners required as whole function component is called on data set change
+#### In your login component create the instance of OtplessManager.
 
 ```
 let manager = new OtplessManager()
-OtplessInstance.removeAllListeners();
-
-OtplessInstance.addListener('OtplessResultEvent', (data: any) => {
-    let message: string = '';
-    if (data.data === null || data.data === undefined) {
-      message = data.errorMessage;
-    } else {
-      let token = data.data.token;
-      // to for token verification as per otpless backend verification doc
-    }
-});
 ```
 
-* Call start method on button click or while loading component to launch OTPless sdk
-
+#### Call showOtplessLoginPage method on button click or while loading component to launch OTPless sdk
 ```
-manager.start();
+let jsonParams = {appId: "APP_ID"}
+const data = await manager.showOtplessLoginPage(jsonParams);
 ```
-
-* If some extra information need to pass for customization, create param attribute and pass to start method
-
-```
-let params = {
-      'method': 'get',
-      'params': {
-        'optional': 'option'
-      }
-    };
-manager.start(params);
-```
-
-* After authentication is completed callback is sent to listener, and sigin button is added at bottom left. User can use this button to launch again OTPless for signin.
-After token verification is completed call onSignInComplete method to removed button and remove listeners
-
-```
-await manager.onSignInCompleted();
-OtplessInstance.removeAllListeners();
-
-```
-
-* If signin button is not required call below line before calling start method
-
-```
-await manager.showFabButton(false);
-```
-<br>
-
-* If button on bottom left is not required, then we can get the response through promise, it calls `showFabButton(false)` internally.
-
-```
-let params = {
-  'method': 'get',
-  'params': {
-    'option': 'option'
-  }
-};
-
-// passing parameter is optional
-let data = await manager.startWithCallback(params);
-let message: string = '';
-if (data.data === null || data.data === undefined) {
-  message = data.errorMessage;
-} else {
-  let token = data.data.token;
-  // to for token verification as per otpless backend verification doc
-}
-```
-<br>
 
 ### IOS
 * Go to your application root folder and install pod. Run the below command
@@ -109,7 +47,7 @@ pod install
   <dict>
    <key>CFBundleURLSchemes</key> 
    <array>
-    <string>$(PRODUCT_BUNDLE_IDENTIFIER).otpless</string> 
+    <stringotpless.your_app_id_in_lowercase</string> 
    </array>
    <key>CFBundleTypeRole</key>
    <string>Editor</string>
@@ -125,6 +63,34 @@ pod install
  <string>com.otpless.ios.app.otpless</string> 
  <string>googlegmail</string>
 </array>
+
+<key>NSAppTransportSecurity</key>
+        <dict>
+            <key>NSAllowsArbitraryLoads</key>
+            <true/>
+            <key>NSExceptionDomains</key>
+            <dict>
+                <key>80.in.safr.sekuramobile.com</key>
+                <dict>
+                    <key>NSIncludesSubdomains</key>
+                    <true/>
+                    <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                    <true/>
+                    <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                    <string>TLSv1.1</string>
+                </dict>
+                <key>partnerapi.jio.com</key>
+                <dict>
+                    <key>NSIncludesSubdomains</key>
+                    <true/>
+                    <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                    <true/>
+                    <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                    <string>TLSv1.1</string>
+                </dict>
+            </dict>
+        </dict>
+
 ```
 
 * Add application method in your AppDelegate
@@ -159,7 +125,224 @@ protected void onCreate(Bundle savedInstanceState) {
   registerPlugin(OtplessPlugin.class);
   super.onCreate(savedInstanceState);
 }
+
+@Override
+public void onBackPressed() {
+    if (OtplessPlugin.onBackPressed(this)) return;
+    super.onBackPressed();
+}
 ```
 
+* In AndroidManifest file added the intent filter in activity tag of your MainActivity
+```
+<intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data
+        android:host="otpless"
+        android:scheme= "otpless.your_app_id_in_lowercase"/>
+</intent-filter>
+```
+
+<br><br><br>
+## Headless API
+
+### IONIC
+
+* Import the OtplessManager
+
+```
+import {OtplessManager} from 'otpless-ionic';
+```
+
+<br>
+
+* In your login component create the instance of OtplessManager.
+
+```
+let manager = new OtplessManager()
+```
+
+* Init the headless sdk in useEffect webhook
+```
+useEffect(() => {
+    manager.initHeadless("APP_ID");
+    manager.setHeadlessCallback(onHeadlessResult);
+    return () => {
+      manager.clearListener();
+    }
+  }, []);
+```
+
+```
+const onHeadlessResult = (data: any) => {
+    let message: string = JSON.stringify(data);
+    console.log(message);
+  }
+```
+
+#### create phone number request for headless initialization
+```
+ headlessRequest = {
+          "phone": phoneNumber,
+          "countryCode": "91"
+        }
+```
+* for verification otp field is required
+```
+ headlessRequest = {
+          "phone": phoneNumber,
+          "countryCode": "91",
+          "otp": otp
+        }
+```
+
+#### create email request for headless initialization
+```
+ headlessRequest = {
+          "email": email
+        
+        }
+```
+* for verification otp field is required
+```
+ headlessRequest = {
+          "email": email,
+          "otp": otp
+        }
+```
+
+#### create sso request like whatsapp for headless initialization
+```
+headlessRequest = {
+        "channelType": WHATSAPP
+      }
+```
+* for verification otp field is required, in case of magic link no verification call is required, it is handled by sdk when user click on link.
+```
+headlessRequest = {
+        "channelType": WHATSAPP,
+        "otp": otp
+      }
+```
+
+
+#### call startHeadless result is given in onHeadlessResult method
+
+```
+await manager.startHeadless(headlessRequest);
+```
+
+### IOS
+* Go to your application root folder and install pod. Run the below command
+```
+pod install
+```
+
+*  Add below lines in info.plist file
+```
+<key>CFBundleURLTypes</key>
+ <array>
+  <dict>
+   <key>CFBundleURLSchemes</key> 
+   <array>
+    <stringotpless.your_app_id_in_lowercase</string> 
+   </array>
+   <key>CFBundleTypeRole</key>
+   <string>Editor</string>
+   <key>CFBundleURLName</key>
+   <string>otpless</string> 
+ </dict>
+</array> 
+<key>LSApplicationQueriesSchemes</key> 
+<array>
+ <string>whatsapp</string>
+ <string>otpless</string> 
+ <string>gootpless</string>
+ <string>com.otpless.ios.app.otpless</string> 
+ <string>googlegmail</string>
+</array>
+
+<key>NSAppTransportSecurity</key>
+        <dict>
+            <key>NSAllowsArbitraryLoads</key>
+            <true/>
+            <key>NSExceptionDomains</key>
+            <dict>
+                <key>80.in.safr.sekuramobile.com</key>
+                <dict>
+                    <key>NSIncludesSubdomains</key>
+                    <true/>
+                    <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                    <true/>
+                    <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                    <string>TLSv1.1</string>
+                </dict>
+                <key>partnerapi.jio.com</key>
+                <dict>
+                    <key>NSIncludesSubdomains</key>
+                    <true/>
+                    <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                    <true/>
+                    <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                    <string>TLSv1.1</string>
+                </dict>
+            </dict>
+        </dict>
+
+```
+
+* Add application method in your AppDelegate
+
+```
+import OtplessSDK
+```
+```
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        if (Otpless.sharedInstance.isOtplessDeeplink(url: url)) {
+            Otpless.sharedInstance.processOtplessDeeplink(url: url)
+            return true
+        }
+        return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+    }
+
+
+}
+```
+<br>
+
+### Android
+* In MainActivity register the plugin, before calling `super.onCreate`.
+```
+import com.otpless.ionic.OtplessPlugin;
+```
+```
+protected void onCreate(Bundle savedInstanceState) {
+  registerPlugin(OtplessPlugin.class);
+  super.onCreate(savedInstanceState);
+}
+
+@Override
+public void onBackPressed() {
+    if (OtplessPlugin.onBackPressed(this)) return;
+    super.onBackPressed();
+}
+```
+
+* In AndroidManifest file added the intent filter in activity tag of your MainActivity
+```
+<intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data
+        android:host="otpless"
+        android:scheme= "otpless.your_app_id_in_lowercase"/>
+</intent-filter>
+```
 
 
