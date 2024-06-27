@@ -66,7 +66,7 @@ public class OtplessPlugin extends Plugin {
             dat = "no uri data";
         }
         Log.d(TAG, "got call in handleOnNewIntent data: " + dat);
-        if (otplessView != null && otplessView.verifyIntent(intent)) return;
+        if (otplessView != null && otplessView.onNewIntent(intent)) return;
         super.handleOnNewIntent(intent);
     }
 
@@ -173,7 +173,7 @@ public class OtplessPlugin extends Plugin {
         }
         String appId = call.getString("appId", "");
         onMainThread(() -> {
-            otplessView.initHeadless(appId, null);
+            otplessView.initHeadless(appId);
         });
         call.resolve();
     }
