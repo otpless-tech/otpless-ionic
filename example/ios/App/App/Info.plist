@@ -7,7 +7,7 @@
       <dict>
        <key>CFBundleURLSchemes</key>
        <array>
-        <string>otpless.5e62zcanetd9urnxpz80</string>
+        <string>otpless.YOUR_APPID_IN_LOWERCASE</string>
        </array>
        <key>CFBundleTypeRole</key>
        <string>Editor</string>
