@@ -12,7 +12,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if(isPlatform('android')) {
-      manager.initHeadless("YOUR_APPID_IN_LOWERCASE");
+      manager.initHeadless("YOUR_APPID");
       manager.setHeadlessCallback(onHeadlessResult);
       console.log("Otpless: android headless init done");
     }
@@ -40,7 +40,7 @@ const Home: React.FC = () => {
   var loaderVisibility = true;
 
   const openLoginPage = async() => {
-    let jsonParams = {appId: "YOUR_APPID_IN_LOWERCASE"}
+    let jsonParams = {appId: "YOUR_APPID"}
     const data = await manager.showOtplessLoginPage(jsonParams);
     handleResult(data);
   }
@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 
   const startHeadless = async () => {
     if(isPlatform('ios') && !isIosHeadlessInit) {
-      manager.initHeadless("YOUR_APPID_IN_LOWERCASE");
+      manager.initHeadless("YOUR_APPID");
       manager.setHeadlessCallback(onHeadlessResult);
       console.log("Otpless: ios headless init done");
       isIosHeadlessInit = true;
