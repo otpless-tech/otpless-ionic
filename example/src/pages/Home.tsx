@@ -39,7 +39,7 @@ const Home: React.FC = () => {
   }
 
   var loaderVisibility = true;
-  const [isDebugEnabled, setIsDebugEnabled] = useState(false); // Toggle state
+  const [isDebugLoggingEnabled, setIsDebugLoggingEnabled] = useState(false); 
 
   const openLoginPage = async() => {
     let jsonParams = {appId: APPID}
@@ -116,7 +116,7 @@ const Home: React.FC = () => {
   }
 
   const toggleDebugLogging = (isEnabled: boolean) => {
-    setIsDebugEnabled(isEnabled);
+    setIsDebugLoggingEnabled(isEnabled);
     manager.enableDebugLogging(isEnabled);
   };
 
@@ -149,7 +149,7 @@ const Home: React.FC = () => {
         </IonItem>
 
         <IonItem lines="none" style={{ margin: "16px" }}>
-          <IonToggle checked={isDebugEnabled} onIonChange={(e) => toggleDebugLogging(e.detail.checked)} />
+          <IonToggle checked={isDebugLoggingEnabled} onIonChange={(e) => toggleDebugLogging(e.detail.checked)} />
           <span style={{ marginLeft: "10px" }}>Enable Debug Logging</span>
         </IonItem>
 
