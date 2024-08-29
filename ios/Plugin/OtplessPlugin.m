@@ -14,4 +14,6 @@ CAP_PLUGIN(OtplessPlugin, "OtplessPlugin",
            CAP_PLUGIN_METHOD(initHeadless, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(setHeadlessCallback, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(startHeadless, CAPPluginReturnPromise);
+
+           CAP_PLUGIN_METHOD(enableDebugLogging, CAPPluginReturnPromise);
 )

@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput, isPlatform } from '@ionic/react';
+import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput, isPlatform, IonToggle } from '@ionic/react';
 import './Home.css';
 
 import {OtplessManager} from 'otpless-ionic';
@@ -9,10 +9,11 @@ const Home: React.FC = () => {
 
   let manager = new OtplessManager()
   let isIosHeadlessInit = false;
+  let APPID = "YOUR_APPID";
 
   useEffect(() => {
     if(isPlatform('android')) {
-      manager.initHeadless("APP_ID");
+      manager.initHeadless(APPID);
       manager.setHeadlessCallback(onHeadlessResult);
       console.log("Otpless: android headless init done");
     }
@@ -38,9 +39,10 @@ const Home: React.FC = () => {
   }
 
   var loaderVisibility = true;
+  const [isDebugEnabled, setIsDebugEnabled] = useState(false); // Toggle state
 
   const openLoginPage = async() => {
-    let jsonParams = {appId: "APP_ID"}
+    let jsonParams = {appId: APPID}
     const data = await manager.showOtplessLoginPage(jsonParams);
     handleResult(data);
   }
@@ -70,7 +72,7 @@ const Home: React.FC = () => {
 
   const startHeadless = async () => {
     if(isPlatform('ios') && !isIosHeadlessInit) {
-      manager.initHeadless("APP_ID");
+      manager.initHeadless(APPID);
       manager.setHeadlessCallback(onHeadlessResult);
       console.log("Otpless: ios headless init done");
       isIosHeadlessInit = true;
@@ -113,41 +115,52 @@ const Home: React.FC = () => {
     await manager.startHeadless(headlessRequest);
   }
 
+  const toggleDebugLogging = (isEnabled: boolean) => {
+    setIsDebugEnabled(isEnabled);
+    manager.enableDebugLogging(isEnabled);
+  };
+
   return (
     <IonPage>
       <IonContent fullscreen>
-        <IonTitle style={{ "marginTop": "16px" }}>Otpless Ionic Sample</IonTitle>
-        <IonButton style={{ "marginTop": "16px" }} onClick={() => openLoginPage()}>Show Login Page</IonButton>
-        <IonButton style={{ "marginTop": "16px" }} onClick={() => toggleLoaderVisibility()}>Toggle Loader Visibility</IonButton>
-        <IonButton style={{ "marginTop": "16px" }} onClick={() => checkWhatsappApp()}>Check Whatsapp</IonButton>
 
-        <IonItem>
+        <IonItem style={{ marginTop: "50px", marginLeft: "16px", marginRight: "16px" }}>
           <IonInput
             value={form.phoneNumber}
-            onIonChange={(e) => handleChange('phoneNumber', e.target.value)}  // Update state when text changes
-            placeholder="Enter Phone or mobile"
+            onIonChange={(e) => handleChange('phoneNumber', e.target.value)}
+            placeholder="Enter Phone or Email"
           />
         </IonItem>
 
-        <IonItem>
+        <IonItem style={{ margin: "16px" }}>
           <IonInput
             value={form.otp}
-            onIonChange={(e) => handleChange('otp', e.target.value!)}  // Update state when text changes
+            onIonChange={(e) => handleChange('otp', e.target.value!)}
             placeholder="Enter OTP"
           />
         </IonItem>
 
-        <IonItem>
+        <IonItem style={{ margin: "16px" }}>
           <IonInput
             value={form.channelType}
-            onIonChange={(e) => handleChange('channelType', e.target.value!)}  // Update state when text changes
+            onIonChange={(e) => handleChange('channelType', e.target.value!)}
             placeholder="Enter Channel Type"
           />
         </IonItem>
 
-        <IonButton style={{ "marginTop": "16px" }} onClick={() => startHeadless()}>Start Headless</IonButton>
+        <IonItem lines="none" style={{ margin: "16px" }}>
+          <IonToggle checked={isDebugEnabled} onIonChange={(e) => toggleDebugLogging(e.detail.checked)} />
+          <span style={{ marginLeft: "10px" }}>Enable Debug Logging</span>
+        </IonItem>
 
-        <IonTextarea autoGrow style={{ "marginTop": "16px" }}>{form.result}</IonTextarea>
+        <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+          <IonButton expand="block" onClick={openLoginPage}>Show Login Page</IonButton>
+          <IonButton expand="block" onClick={toggleLoaderVisibility}>Toggle Loader Visibility</IonButton>
+          <IonButton expand="block" onClick={checkWhatsappApp}>Check Whatsapp</IonButton>
+          <IonButton expand="block" onClick={startHeadless}>Start Headless</IonButton>
+        </div>
+
+        <IonTextarea autoGrow style={{ margin: "16px" }}>{form.result}</IonTextarea>
       </IonContent>
     </IonPage>
   );

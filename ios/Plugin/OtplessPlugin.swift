@@ -72,6 +72,18 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
         }
     }
     
+    /**
+     Enables/Disables debug logging in Android and iOS using the provided boolean value.
+     - parameter call call having additional jsonParams info and promise object
+     */
+    @objc func enableDebugLogging(_ call: CAPPluginCall) {
+        let isEnabled = call.getBool("isEnabled", false)
+
+        if isEnabled {
+            Otpless.sharedInstance.setLoggerDelegate(delegate: self)
+        }
+    }
+
     private func makeHeadlessRequest(jsRequest: JSObject) -> HeadlessRequest {
         let headlessRequest = HeadlessRequest()
         if let phone = jsRequest["phone"] {
@@ -98,6 +110,12 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
         notifyListeners("OtplessResultEvent", data: result)
     }
     
+}
+
+extension OtplessPlugin: OtplessLoggerDelegate {
+    public func otplessLog(string: String, type: String) {
+        print("Otpless Log of type : \(type)\n\n\(string)")
+    }
 }
 
 class CapPluginCallWrapper: onResponseDelegate {

@@ -18,4 +18,7 @@ export interface OtplessPlugin extends Plugin {
   setHeadlessCallback(): Promise<void>;
   // to start headless sdk
   startHeadless(option: {request: any}): Promise<void>;
+
+  //enable debug logging
+  enableDebugLogging(option: {isEnabled: boolean}): Promise<void>;
 }

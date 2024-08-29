@@ -56,6 +56,11 @@ class OtplessManager {
   clearListener() {
     OtplessInstance.removeAllListeners();
   }
+
+  // Enable debug logging
+  async enableDebugLogging(isEnabled: boolean) {
+    await OtplessInstance.enableDebugLogging({isEnabled: isEnabled});
+  }
 }
 
 export * from './definitions';

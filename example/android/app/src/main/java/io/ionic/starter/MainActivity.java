@@ -1,5 +1,6 @@
 package io.ionic.starter;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.getcapacitor.BridgeActivity;
@@ -16,5 +17,11 @@ public class MainActivity extends BridgeActivity {
     public void onBackPressed() {
         if (OtplessPlugin.onBackPressed(this)) return;
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (OtplessPlugin.onActivityResult(this, requestCode, resultCode, data)) return;
     }
 }

@@ -43,6 +43,24 @@ public class OtplessPlugin extends Plugin {
         return false;
     }
 
+    /**
+     * Handles the onActivityResult callback for the OtplessPlugin.
+     * @param activity The Ionic BridgeActivity dependency.
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode The result code returned by the child activity.
+     * @param data An Intent containing the result data returned by the child activity.
+     * @return boolean Returns true if the requestCode matches one of the Otpless' request codes, otherwise false.
+     */
+    public static boolean onActivityResult(BridgeActivity activity, int requestCode, int resultCode, Intent data) {
+        final Bridge bridge = activity.getBridge();
+        if (bridge == null) return false;
+        if (bridge.getPlugin("OtplessPlugin") != null) {
+            final PluginHandle handle = bridge.getPlugin("OtplessPlugin");
+            return ((OtplessPlugin) handle.getInstance()).otplessView.onActivityResult(requestCode, resultCode, data);
+        }
+        return false;
+    }
+
     @Override
     public void load() {
         checkOrInitOtpless(getActivity());
@@ -200,6 +218,19 @@ public class OtplessPlugin extends Plugin {
         onMainThread(() -> {
             otplessView.startHeadless(makeHeadlessRequest(jsRequest), this::onHeadlessResponse);
         });
+        call.resolve();
+    }
+
+    /**
+     * Enables/Disables debug logging in Android and iOS using the provided boolean value.
+     *
+     * @param call having additional jsonParams info and promise object
+     */
+    @PluginMethod
+    public void enableDebugLogging(PluginCall call) {
+        Boolean isEnabled = call.getBoolean("isEnabled", true);
+        isEnabled = isEnabled == null || isEnabled;
+        Utility.debugLogging = isEnabled;
         call.resolve();
     }
 
