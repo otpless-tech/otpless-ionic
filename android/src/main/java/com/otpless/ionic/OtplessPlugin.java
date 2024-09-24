@@ -71,6 +71,7 @@ public class OtplessPlugin extends Plugin {
         if (activity == null) return false;
         if (otplessView == null) {
             otplessView = OtplessManager.getInstance().getOtplessView(activity);
+            otplessView.getPhoneHintManager().registerInOnCreate(activity);
         }
         return true;
     }
@@ -172,18 +173,6 @@ public class OtplessPlugin extends Plugin {
     }
 
     @PluginMethod
-    public void enableOneTap(PluginCall call) {
-        if (!checkOrInitOtpless(getActivity())) {
-            call.resolve();
-            return;
-        }
-        Boolean isOnetap = call.getBoolean("isOnetap", true);
-        isOnetap = isOnetap == null || isOnetap;
-        otplessView.enableOneTap(isOnetap);
-        call.resolve();
-    }
-
-    @PluginMethod
     public void initHeadless(PluginCall call) {
         if (!checkOrInitOtpless(getActivity())) {
             call.resolve();
@@ -232,6 +221,23 @@ public class OtplessPlugin extends Plugin {
         isEnabled = isEnabled == null || isEnabled;
         Utility.debugLogging = isEnabled;
         call.resolve();
+    }
+
+    @PluginMethod
+    public void showPhoneHintLib(PluginCall call) {
+        Boolean showFallback = call.getBoolean("showFallback", true);
+        otplessView.getPhoneHintManager().showPhoneNumberHint(Boolean.TRUE.equals(showFallback), response -> {
+            JSObject object = new JSObject();
+            if (response.getSecond() != null) {
+                String error = response.getSecond().getMessage() != null ? response.getSecond().getMessage() : "Unable to get phone number.";
+                object.put("error", error);
+            } else {
+                object.put("phoneNumber", response.getFirst());
+            }
+
+            call.resolve(object);
+            return null;
+        });
     }
 
     private HeadlessRequest makeHeadlessRequest(final JSObject jsRequest) {

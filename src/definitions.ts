@@ -21,4 +21,7 @@ export interface OtplessPlugin extends Plugin {
 
   //enable debug logging
   enableDebugLogging(option: {isEnabled: boolean}): Promise<void>;
+
+  // show phone hint lib
+  showPhoneHintLib(showFallback: boolean): Promise<{ [key: string]: string }>;
 }
