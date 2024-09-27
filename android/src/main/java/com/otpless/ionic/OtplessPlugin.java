@@ -43,6 +43,24 @@ public class OtplessPlugin extends Plugin {
         return false;
     }
 
+    /**
+     * Handles the onActivityResult callback for the OtplessPlugin.
+     * @param activity The Ionic BridgeActivity dependency.
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode The result code returned by the child activity.
+     * @param data An Intent containing the result data returned by the child activity.
+     * @return boolean Returns true if the requestCode matches one of the Otpless' request codes, otherwise false.
+     */
+    public static boolean onActivityResult(BridgeActivity activity, int requestCode, int resultCode, Intent data) {
+        final Bridge bridge = activity.getBridge();
+        if (bridge == null) return false;
+        if (bridge.getPlugin("OtplessPlugin") != null) {
+            final PluginHandle handle = bridge.getPlugin("OtplessPlugin");
+            return ((OtplessPlugin) handle.getInstance()).otplessView.onActivityResult(requestCode, resultCode, data);
+        }
+        return false;
+    }
+
     @Override
     public void load() {
         checkOrInitOtpless(getActivity());
@@ -53,6 +71,7 @@ public class OtplessPlugin extends Plugin {
         if (activity == null) return false;
         if (otplessView == null) {
             otplessView = OtplessManager.getInstance().getOtplessView(activity);
+            otplessView.getPhoneHintManager().registerInOnCreate(activity);
         }
         return true;
     }
@@ -154,18 +173,6 @@ public class OtplessPlugin extends Plugin {
     }
 
     @PluginMethod
-    public void enableOneTap(PluginCall call) {
-        if (!checkOrInitOtpless(getActivity())) {
-            call.resolve();
-            return;
-        }
-        Boolean isOnetap = call.getBoolean("isOnetap", true);
-        isOnetap = isOnetap == null || isOnetap;
-        otplessView.enableOneTap(isOnetap);
-        call.resolve();
-    }
-
-    @PluginMethod
     public void initHeadless(PluginCall call) {
         if (!checkOrInitOtpless(getActivity())) {
             call.resolve();
@@ -201,6 +208,36 @@ public class OtplessPlugin extends Plugin {
             otplessView.startHeadless(makeHeadlessRequest(jsRequest), this::onHeadlessResponse);
         });
         call.resolve();
+    }
+
+    /**
+     * Enables/Disables debug logging in Android and iOS using the provided boolean value.
+     *
+     * @param call having additional jsonParams info and promise object
+     */
+    @PluginMethod
+    public void enableDebugLogging(PluginCall call) {
+        Boolean isEnabled = call.getBoolean("isEnabled", true);
+        isEnabled = isEnabled == null || isEnabled;
+        Utility.debugLogging = isEnabled;
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void showPhoneHintLib(PluginCall call) {
+        Boolean showFallback = call.getBoolean("showFallback", true);
+        otplessView.getPhoneHintManager().showPhoneNumberHint(Boolean.TRUE.equals(showFallback), response -> {
+            JSObject object = new JSObject();
+            if (response.getSecond() != null) {
+                String error = response.getSecond().getMessage() != null ? response.getSecond().getMessage() : "Unable to get phone number.";
+                object.put("error", error);
+            } else {
+                object.put("phoneNumber", response.getFirst());
+            }
+
+            call.resolve(object);
+            return null;
+        });
     }
 
     private HeadlessRequest makeHeadlessRequest(final JSObject jsRequest) {

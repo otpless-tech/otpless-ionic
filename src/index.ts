@@ -56,6 +56,17 @@ class OtplessManager {
   clearListener() {
     OtplessInstance.removeAllListeners();
   }
+
+  // Enable debug logging
+  async enableDebugLogging(isEnabled: boolean) {
+    await OtplessInstance.enableDebugLogging({isEnabled: isEnabled});
+  }
+
+  // show phone hint lib
+  async showPhoneHintLib(showFallback: boolean) {
+    const phoneHintLibResult = await OtplessInstance.showPhoneHintLib(showFallback)
+    return phoneHintLibResult
+  }
 }
 
 export * from './definitions';

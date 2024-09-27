@@ -15,8 +15,9 @@
     "@capacitor/app": "^4.0.0",
     "@capacitor/haptics": "^4.0.0",
     "@capacitor/ios": "^4.0.0",
-    "@capacitor/keyboard": "^4.0.0",
+    "@capacitor/keyboard": "^4.1.1",
     "@capacitor/status-bar": "^4.0.0",
+    "@ionic-native/keyboard": "^5.36.0",
     "@ionic/react": "^7.0.0",
     "@ionic/react-router": "^7.0.0",
     "@types/react-router": "^5.1.20",
@@ -29,7 +30,7 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "@capacitor/cli": "^4.0.0",
+    "@capacitor/cli": "^5.7.8",
     "@capacitor/core": "^4.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",

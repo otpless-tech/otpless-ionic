@@ -41,12 +41,6 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
         call.resolve()
     }
     
-    @objc func enableOneTap(_ call: CAPPluginCall) {
-        let isOnetap = call.getBool("isOnetap", true)
-        Otpless.sharedInstance.setOneTapEnabled(isOnetap)
-        call.resolve()
-    }
-    
     @objc func initHeadless(_ call: CAPPluginCall) {
         let appId = call.getString("appId", "")
         DispatchQueue.main.async {
@@ -61,7 +55,6 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
     
     @objc func startHeadless(_ call: CAPPluginCall) {
         let jsRequest: JSObject = call.getObject("request")!
-        let viewController = UIApplication.shared.delegate?.window??.rootViewController
         let headlessRequest = makeHeadlessRequest(jsRequest: jsRequest)
         DispatchQueue.main.async {
             if let otp = jsRequest["otp"] {
@@ -72,6 +65,24 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
         }
     }
     
+    /**
+     Enables/Disables debug logging in Android and iOS using the provided boolean value.
+     - parameter call call having additional jsonParams info and promise object
+     */
+    @objc func enableDebugLogging(_ call: CAPPluginCall) {
+        let isEnabled = call.getBool("isEnabled", false)
+
+        if isEnabled {
+            Otpless.sharedInstance.setLoggerDelegate(delegate: self)
+        }
+    }
+    
+    @objc public func showPhoneHintLib(_ call: CAPPluginCall) {
+        var result: JSObject = JSObject()
+        result["error"] = "Phone hint lib does not work on iOS."
+        call.resolve(result)
+    }
+
     private func makeHeadlessRequest(jsRequest: JSObject) -> HeadlessRequest {
         let headlessRequest = HeadlessRequest()
         if let phone = jsRequest["phone"] {
@@ -98,6 +109,12 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
         notifyListeners("OtplessResultEvent", data: result)
     }
     
+}
+
+extension OtplessPlugin: OtplessLoggerDelegate {
+    public func otplessLog(string: String, type: String) {
+        print("Otpless Log of type : \(type)\n\n\(string)")
+    }
 }
 
 class CapPluginCallWrapper: onResponseDelegate {
