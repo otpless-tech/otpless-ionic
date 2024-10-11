@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput, IonHeader, IonToolbar, IonToast } from '@ionic/react';
+import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput, IonHeader, IonToolbar, IonToast, IonRow } from '@ionic/react';
 import {OtplessManager} from 'otpless-ionic';
 import { useEffect, useState } from 'react';
 import { APPID } from './Home';
@@ -17,11 +17,14 @@ const StartHeadless: React.FC = () => {
     }, []);
 
     const [otplessResponse, setOtplessResponse] = useState('');
-    const [countryCode, setCountryCode] = useState('91');
+    const [countryCode, setCountryCode] = useState('+91');
     const [phone, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [email, setEmail] = useState('');
     const [channelType, setChannelType] = useState('');
+    const [deliveryChannel, setDeliveryChannel] = useState('');
+    const [otpLength, setOtpLength] = useState('');
+    const [expiry, setOtpExpiry] = useState('');
 
     const startWithPhoneAndEmail = async () => {
         let headlessRequest = {};
@@ -30,6 +33,9 @@ const StartHeadless: React.FC = () => {
             headlessRequest = {
                 countryCode,
                 phone,
+                deliveryChannel,
+                expiry,
+                otpLength
             };
             if (otp.length > 0) {
                 headlessRequest = {
@@ -72,7 +78,7 @@ const StartHeadless: React.FC = () => {
         try {
             let response = await manager.showPhoneHintLib(true);
             if (response.phoneNumber) {
-                setPhoneNumber(response.phoneNumber)
+                setPhoneNumber(response.phoneNumber.substring(3))
             } else if (response.error) {
                 setOtplessResponse(response.error)
             }
@@ -90,22 +96,82 @@ const StartHeadless: React.FC = () => {
                     <IonTitle>Start Headless</IonTitle>
                 </IonToolbar>
             </IonHeader>
+
             <IonContent fullscreen>
                 <IonItem style={{ marginTop: "16px", marginLeft: "16px", marginRight: "16px" }}>
-                    <IonInput inputmode="numeric" value={phone} onIonInput={(e) => setPhoneNumber(e.detail.value!)} placeholder="Enter Phone Number" />
+                    <IonInput
+                        inputmode="numeric"
+                        value={phone}
+                        onIonInput={(e) => setPhoneNumber(e.detail.value!)}
+                        placeholder="Enter Phone Number"
+                    />
                 </IonItem>
+
+                <IonRow style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <IonItem style={{ margin: "8px", flex: 1 }}>
+                        <IonInput
+                            inputmode="numeric"
+                            value={countryCode}
+                            onIonInput={(e) => setCountryCode(e.detail.value!)}
+                            placeholder="Country Code"
+                        />
+                    </IonItem>
+
+                    <IonItem style={{ margin: "8px", flex: 1 }}>
+                        <IonInput
+                            inputmode="numeric"
+                            value={otpLength}
+                            onIonInput={(e) => setOtpLength(e.detail.value!)}
+                            placeholder="OTP Length"
+                        />
+                    </IonItem>
+
+                    <IonItem style={{ margin: "8px", flex: 1 }}>
+                        <IonInput
+                            inputmode="numeric"
+                            value={expiry}
+                            onIonInput={(e) => setOtpExpiry(e.detail.value!)}
+                            placeholder="OTP Expiry"
+                        />
+                    </IonItem>
+                </IonRow>
+
                 <IonItem style={{ margin: "16px" }}>
-                    <IonInput inputmode="numeric" value={countryCode} onIonInput={(e) => setCountryCode(e.detail.value!)} placeholder="Enter Country Code" />
+                    <IonInput
+                        inputmode="email"
+                        value={email}
+                        onIonInput={(e) => setEmail(e.detail.value!)}
+                        placeholder="Enter Email"
+                    />
                 </IonItem>
+
                 <IonItem style={{ margin: "16px" }}>
-                    <IonInput inputmode="email" value={email} onIonInput={(e) => setEmail(e.detail.value!)} placeholder="Enter Email" />
+                    <IonInput
+                        value={otp}
+                        onIonInput={(e) => setOtp(e.detail.value!)}
+                        placeholder="Enter OTP"
+                    />
                 </IonItem>
-                <IonItem style={{ margin: "16px" }}>
-                    <IonInput value={otp} onIonInput={(e) => setOtp(e.detail.value!)} placeholder="Enter OTP" />
-                </IonItem>
-                <IonItem style={{ margin: "16px" }}>
-                    <IonInput value={channelType} onIonInput={(e) => setChannelType(e.detail.value!.toUpperCase())} placeholder="Enter Channel Type" />
-                </IonItem>
+
+                <IonRow style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <IonItem style={{ margin: "8px", flex: 1 }}>
+                        <IonInput
+                            value={channelType}
+                            onIonInput={(e) => setChannelType(e.detail.value!.toUpperCase())}
+                            placeholder="SSO Channel"
+                        />
+                    </IonItem>
+
+                    <IonItem style={{ margin: "8px", flex: 1 }}>
+                        <IonInput
+                            value={deliveryChannel}
+                            onIonInput={(e) => setDeliveryChannel(e.detail.value!.toUpperCase())}
+                            placeholder="Enter Delivery Channel"
+                        />
+                    </IonItem>
+                </IonRow>
+
+
 
                 <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
                     <IonButton expand="block" onClick={startWithPhoneAndEmail}>Start with Phone/Email</IonButton>

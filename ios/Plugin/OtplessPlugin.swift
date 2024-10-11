@@ -93,6 +93,20 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
         } else {
             headlessRequest.setChannelType(jsRequest["channelType"] as! String)
         }
+        
+        if let otpLength = jsRequest["otpLength"] as? String,
+           !otpLength.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            headlessRequest.setOtpLength(otpLength: otpLength)
+        }
+        if let expiry = jsRequest["expiry"] as? String,
+           !expiry.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            headlessRequest.setExpiry(expiry: expiry)
+        }
+        if let deliveryChannel = jsRequest["deliveryChannel"] as? String,
+           !deliveryChannel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            headlessRequest.setDeliveryChannel(deliveryChannel)
+        }
+        
         return headlessRequest;
     }
     
