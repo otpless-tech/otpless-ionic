@@ -250,10 +250,6 @@ public class OtplessPlugin extends Plugin {
             final String countryCode = jsRequest.optString("countryCode", "");
             headlessRequest.setPhoneNumber(countryCode, phone);
             final String otp = jsRequest.optString("otp", "");
-            final String deliveryChannel = jsRequest.optString("deliveryChannel", "");
-            if (!deliveryChannel.isBlank()) {
-                headlessRequest.setDeliveryChannel(OtpDeliveryChannel.from(deliveryChannel.toUpperCase()));
-            }
             // check otp with phone number
             if (!otp.isEmpty()) {
                 headlessRequest.setOtp(otp);
@@ -276,6 +272,11 @@ public class OtplessPlugin extends Plugin {
         }
         final int otpLength = jsRequest.optInt("otpLength", -1);
         final int expiry = jsRequest.optInt("expiry", -1);
+        final String deliveryChannel = jsRequest.optString("deliveryChannel", "");
+
+        if (!deliveryChannel.isBlank()) {
+            headlessRequest.setDeliveryChannel(OtpDeliveryChannel.from(deliveryChannel.toUpperCase()));
+        }
         if (otpLength != -1) {
             headlessRequest.setOtpLength(OtpLength.suggestOtpSize(otpLength));
         }
