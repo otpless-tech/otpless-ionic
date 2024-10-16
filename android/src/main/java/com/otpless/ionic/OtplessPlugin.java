@@ -16,6 +16,8 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.otpless.dto.HeadlessRequest;
 import com.otpless.dto.HeadlessResponse;
+import com.otpless.dto.OtpDeliveryChannel;
+import com.otpless.dto.OtpLength;
 import com.otpless.dto.OtplessRequest;
 import com.otpless.main.OtplessManager;
 import com.otpless.main.OtplessView;
@@ -71,7 +73,7 @@ public class OtplessPlugin extends Plugin {
         if (activity == null) return false;
         if (otplessView == null) {
             otplessView = OtplessManager.getInstance().getOtplessView(activity);
-            otplessView.getPhoneHintManager().registerInOnCreate(activity);
+            otplessView.getPhoneHintManager().register(activity, false);
         }
         return true;
     }
@@ -267,6 +269,19 @@ public class OtplessPlugin extends Plugin {
                 final String channelType = jsRequest.optString("channelType", "");
                 headlessRequest.setChannelType(channelType);
             }
+        }
+        final int otpLength = jsRequest.optInt("otpLength", -1);
+        final int expiry = jsRequest.optInt("expiry", -1);
+        final String deliveryChannel = jsRequest.optString("deliveryChannel", "");
+
+        if (!deliveryChannel.isBlank()) {
+            headlessRequest.setDeliveryChannel(OtpDeliveryChannel.from(deliveryChannel.toUpperCase()));
+        }
+        if (otpLength != -1) {
+            headlessRequest.setOtpLength(OtpLength.suggestOtpSize(otpLength));
+        }
+        if (expiry != -1) {
+            headlessRequest.setExpiry(expiry);
         }
         return headlessRequest;
     }
