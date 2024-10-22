@@ -261,7 +261,7 @@ public class OtplessPlugin extends Plugin {
             call.resolve();
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException ex) {
             Utility.debugLog(ex);
-            call.reject("SERVICE_ERROR", "Failed to create otpless service." + ex.getMessage());
+            call.reject("SERVICE_ERROR", "Failed to create otpless service.\n" + ex.getMessage());
         }
     }
 
