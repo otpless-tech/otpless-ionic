@@ -261,7 +261,7 @@ public class OtplessPlugin extends Plugin {
             call.resolve();
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException ex) {
             Utility.debugLog(ex);
-            call.reject("SERVICE_ERROR", "Failed to create otpless service.\n" + ex.getMessage());
+            call.reject("Failed to create otpless service.", "SERVICE_ERROR", ex);
         }
     }
 
@@ -278,7 +278,6 @@ public class OtplessPlugin extends Plugin {
                     simInfo.put("transactionTime", entry.getTransactionTime());
                     resultArray.put(simInfo);
                 }
-
                 result.put("entries", resultArray);
                 notifyListeners("otpless_sim_status_change_event", result);
                 return null;
@@ -305,7 +304,7 @@ public class OtplessPlugin extends Plugin {
             result.put("entries", entriesArray);
             call.resolve(result);
         } catch (Exception e) {
-            call.reject("SIM_ERROR", "Failed to get ejected SIM entries", e);
+            call.reject("Failed to get ejected SIM entries", "SIM_ERROR", e);
         }
     }
 
