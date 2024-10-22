@@ -274,7 +274,6 @@ public class OtplessPlugin extends Plugin {
     @PluginMethod
     public void setSimEjectionsListener(PluginCall call) {
         boolean isToAttach = Boolean.TRUE.equals(call.getBoolean("isToAttach", false));
-
         if (isToAttach) {
             JSObject result = new JSObject();
             OtplessSimStateReceiverApi.INSTANCE.setSimStateChangeListener(simStateEntries -> {
@@ -303,16 +302,13 @@ public class OtplessPlugin extends Plugin {
         try {
             List<SimStateEntry> simEntries = OtplessSimStateReceiverApi.INSTANCE.savedEjectedSimEntries(getContext());
             JSArray entriesArray = new JSArray();
-
             for (SimStateEntry entry : simEntries) {
                 JSObject simInfo = new JSObject();
                 simInfo.put("state", entry.getState());
                 simInfo.put("transactionTime", entry.getTransactionTime());
                 entriesArray.put(simInfo);
             }
-
             result.put("entries", entriesArray);
-
             call.resolve(result);
         } catch (Exception e) {
             call.reject("SIM_ERROR", "Failed to get ejected SIM entries", e);

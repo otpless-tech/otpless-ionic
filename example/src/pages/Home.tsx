@@ -15,7 +15,7 @@ const Home: React.FC = () => {
 
     return () => {
       manager.clearListener()
-      otplessSimUtils.clearListeners()
+      otplessSimUtils.clearSimEjectionsListener()
     }
   }, [])
 
@@ -30,7 +30,7 @@ const Home: React.FC = () => {
 
   const setSimEjectionListener = async () => {
     try {
-      otplessSimUtils.setSimEjectionsListener(true, (data: any) => {
+      otplessSimUtils.setSimEjectionsListener((data: any) => {
         setSimStates(JSON.stringify(data.entries))
       })
     } catch (error) {

@@ -86,11 +86,12 @@ class OtplessSimUtils {
 
   private constructor() {}
 
-  clearListeners() {
+  clearSimEjectionsListener() {
     if (this.simStatusChangeListener) {
       this.simStatusChangeListener.remove();
       this.simStatusChangeListener = null;
     }
+    OtplessInstance.setSimEjectionsListener({ isToAttach: false })
   }
 
   public static getInstance(): OtplessSimUtils {
@@ -104,12 +105,12 @@ class OtplessSimUtils {
     return await OtplessInstance.getSimEjectionEntries();
   }
 
-  async setSimEjectionsListener(isToAttach: boolean, resultCallback: OtplessResultCallback) {
+  async setSimEjectionsListener(resultCallback: OtplessResultCallback) {
     if (this.simStatusChangeListener) {
       this.simStatusChangeListener.remove();
     }
     this.simStatusChangeListener = OtplessInstance.addListener('otpless_sim_status_change_event', resultCallback);
-    await OtplessInstance.setSimEjectionsListener({ isToAttach: isToAttach });
+    await OtplessInstance.setSimEjectionsListener({ isToAttach: true });
   }
 }
 
