@@ -9,6 +9,7 @@ interface OtplessResultCallback {
 }
 
 class OtplessManager {
+  private otplessResultEventListener: any;
 
   // to open the otpless login page
   async showOtplessLoginPage(jsonParams: any) {
@@ -43,8 +44,10 @@ class OtplessManager {
 
   // to set headless callback
   async setHeadlessCallback(resultCallback: OtplessResultCallback) {
-    OtplessInstance.removeAllListeners();
-    OtplessInstance.addListener('OtplessResultEvent', resultCallback);
+    if (this.otplessResultEventListener) {
+      this.otplessResultEventListener.remove();
+    }
+    this.otplessResultEventListener = OtplessInstance.addListener('OtplessResultEvent', resultCallback);
     await OtplessInstance.setHeadlessCallback();
   }
 
@@ -54,7 +57,10 @@ class OtplessManager {
   }
 
   clearListener() {
-    OtplessInstance.removeAllListeners();
+    if (this.otplessResultEventListener) {
+      this.otplessResultEventListener.remove();
+      this.otplessResultEventListener = null;
+    }
   }
 
   // Enable debug logging
@@ -67,7 +73,45 @@ class OtplessManager {
     const phoneHintLibResult = await OtplessInstance.showPhoneHintLib(showFallback)
     return phoneHintLibResult
   }
+
+  async attachSecureSDK(appId: string) {
+    return await OtplessInstance.attachSecureSDK({ appId });
+  }
+}
+
+// Singleton class to prevent multiple listeners from being created.
+class OtplessSimUtils {
+  private static instance: OtplessSimUtils | null = null;
+  private simStatusChangeListener: any
+
+  private constructor() {}
+
+  clearListeners() {
+    if (this.simStatusChangeListener) {
+      this.simStatusChangeListener.remove();
+      this.simStatusChangeListener = null;
+    }
+  }
+
+  public static getInstance(): OtplessSimUtils {
+    if (this.instance === null) {
+      this.instance = new OtplessSimUtils();
+    }
+    return this.instance;
+  }
+
+  async getSimEjectionEntries(): Promise<any[]> {
+    return await OtplessInstance.getSimEjectionEntries();
+  }
+
+  async setSimEjectionsListener(isToAttach: boolean, resultCallback: OtplessResultCallback) {
+    if (this.simStatusChangeListener) {
+      this.simStatusChangeListener.remove();
+    }
+    this.simStatusChangeListener = OtplessInstance.addListener('otpless_sim_status_change_event', resultCallback);
+    await OtplessInstance.setSimEjectionsListener({ isToAttach: isToAttach });
+  }
 }
 
 export * from './definitions';
-export { OtplessManager, OtplessInstance };
+export { OtplessManager, OtplessInstance, OtplessSimUtils };

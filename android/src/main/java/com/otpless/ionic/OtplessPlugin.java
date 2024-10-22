@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.getcapacitor.Bridge;
 import com.getcapacitor.BridgeActivity;
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -21,9 +22,15 @@ import com.otpless.dto.OtpLength;
 import com.otpless.dto.OtplessRequest;
 import com.otpless.main.OtplessManager;
 import com.otpless.main.OtplessView;
+import com.otpless.tesseract.OtplessSecureService;
+import com.otpless.tesseract.SimStateEntry;
+import com.otpless.tesseract.sim.OtplessSimStateReceiverApi;
 import com.otpless.utils.Utility;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.List;
 
 @CapacitorPlugin(name = "OtplessPlugin")
 public class OtplessPlugin extends Plugin {
@@ -240,6 +247,76 @@ public class OtplessPlugin extends Plugin {
             call.resolve(object);
             return null;
         });
+    }
+
+    @PluginMethod
+    public void attachSecureSDK(PluginCall call) {
+        String appId = call.getString("appId", "");
+        try {
+            Class<?> managerClass = Class.forName("com.otpless.secure.OtplessSecureManager");
+            Object managerInstance = managerClass.getField("INSTANCE").get(null);
+            Method creatorMethod = managerClass.getDeclaredMethod("getOtplessSecureService", Activity.class, String.class);
+            OtplessSecureService secureService = (OtplessSecureService) creatorMethod.invoke(managerInstance, getActivity(), appId);
+            otplessView.attachOtplessSecureService(secureService);
+            call.resolve();
+        } catch (ClassNotFoundException | NoSuchMethodException ex) {
+            Utility.debugLog(ex);
+            call.reject("SERVICE_ERROR", "Failed to create otpless service." + ex.getMessage());
+        } catch (IllegalAccessException ex) {
+            Utility.debugLog(ex);
+            call.reject("SERVICE_ERROR", "Failed to access the otpless service." + ex.getMessage());
+        } catch (InvocationTargetException | NoSuchFieldException ex) {
+            Utility.debugLog(ex);
+            call.reject("SERVICE_ERROR", "Failed to invoke otpless service method." + ex.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void setSimEjectionsListener(PluginCall call) {
+        boolean isToAttach = Boolean.TRUE.equals(call.getBoolean("isToAttach", false));
+
+        if (isToAttach) {
+            JSObject result = new JSObject();
+            OtplessSimStateReceiverApi.INSTANCE.setSimStateChangeListener(simStateEntries -> {
+                JSArray resultArray = new JSArray();
+                for (SimStateEntry entry : simStateEntries) {
+                    JSObject simInfo = new JSObject();
+                    simInfo.put("state", entry.getState());
+                    simInfo.put("transactionTime", entry.getTransactionTime());
+                    resultArray.put(simInfo);
+                }
+
+                result.put("entries", resultArray);
+                notifyListeners("otpless_sim_status_change_event", result);
+                return null;
+            });
+            call.resolve();
+        } else {
+            OtplessSimStateReceiverApi.INSTANCE.setSimStateChangeListener(null);
+            call.resolve();
+        }
+    }
+
+    @PluginMethod
+    public void getSimEjectionEntries(PluginCall call) {
+        JSObject result = new JSObject();
+        try {
+            List<SimStateEntry> simEntries = OtplessSimStateReceiverApi.INSTANCE.savedEjectedSimEntries(getContext());
+            JSArray entriesArray = new JSArray();
+
+            for (SimStateEntry entry : simEntries) {
+                JSObject simInfo = new JSObject();
+                simInfo.put("state", entry.getState());
+                simInfo.put("transactionTime", entry.getTransactionTime());
+                entriesArray.put(simInfo);
+            }
+
+            result.put("entries", entriesArray);
+
+            call.resolve(result);
+        } catch (Exception e) {
+            call.reject("SIM_ERROR", "Failed to get ejected SIM entries", e);
+        }
     }
 
     private HeadlessRequest makeHeadlessRequest(final JSObject jsRequest) {

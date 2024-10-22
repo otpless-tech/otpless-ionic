@@ -1,5 +1,6 @@
 import { IonButton, IonContent, IonPage, IonTextarea, IonTitle, IonItem, IonInput, IonHeader, IonToolbar, IonToast, IonRow } from '@ionic/react';
 import {OtplessManager} from 'otpless-ionic';
+// import { OtplessManager } from '../../../src/'
 import { useEffect, useState } from 'react';
 import { APPID } from './Home';
 

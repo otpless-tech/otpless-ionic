@@ -82,6 +82,18 @@ public class OtplessPlugin: CAPPlugin, onHeadlessResponseDelegate {
         result["error"] = "Phone hint lib does not work on iOS."
         call.resolve(result)
     }
+    
+    @objc public func attachSecureSDK(_ call: CAPPluginCall) {
+        call.reject("Secure SDK is not supported on iOS.")
+    }
+    
+    @objc public func getSimEjectionEntries(_ call: CAPPluginCall) {
+        call.reject("Sim ejection entries cannot be fetched in iOS.")
+    }
+    
+    @objc public func setSimEjectionsListener(_ call: CAPPluginCall) {
+        call.reject("Sim ejection listener is not supported on iOS.")
+    }
 
     private func makeHeadlessRequest(jsRequest: JSObject) -> HeadlessRequest {
         let headlessRequest = HeadlessRequest()

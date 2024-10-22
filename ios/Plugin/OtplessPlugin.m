@@ -17,4 +17,8 @@ CAP_PLUGIN(OtplessPlugin, "OtplessPlugin",
            CAP_PLUGIN_METHOD(enableDebugLogging, CAPPluginReturnPromise);
            
            CAP_PLUGIN_METHOD(showPhoneHintLib, CAPPluginReturnPromise);
+           
+           CAP_PLUGIN_METHOD(attachSecureSDK, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(setSimEjectionsListener, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getSimEjectionEntries, CAPPluginReturnPromise);
 )
