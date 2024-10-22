@@ -259,15 +259,9 @@ public class OtplessPlugin extends Plugin {
             OtplessSecureService secureService = (OtplessSecureService) creatorMethod.invoke(managerInstance, getActivity(), appId);
             otplessView.attachOtplessSecureService(secureService);
             call.resolve();
-        } catch (ClassNotFoundException | NoSuchMethodException ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException ex) {
             Utility.debugLog(ex);
             call.reject("SERVICE_ERROR", "Failed to create otpless service." + ex.getMessage());
-        } catch (IllegalAccessException ex) {
-            Utility.debugLog(ex);
-            call.reject("SERVICE_ERROR", "Failed to access the otpless service." + ex.getMessage());
-        } catch (InvocationTargetException | NoSuchFieldException ex) {
-            Utility.debugLog(ex);
-            call.reject("SERVICE_ERROR", "Failed to invoke otpless service method." + ex.getMessage());
         }
     }
 
