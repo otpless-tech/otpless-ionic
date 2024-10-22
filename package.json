@@ -1,6 +1,6 @@
 {
   "name": "otpless-ionic",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Otpless ionic plugin support for android and ios apps",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

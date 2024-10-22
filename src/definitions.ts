@@ -24,4 +24,13 @@ export interface OtplessPlugin extends Plugin {
 
   // show phone hint lib
   showPhoneHintLib(showFallback: boolean): Promise<{ [key: string]: string }>;
+
+  // attach secure sdk
+  attachSecureSDK(option: { appId: string }): Promise<void>;
+
+  // set sim ejection listener
+  setSimEjectionsListener(option: { isToAttach: boolean }): Promise<void>
+
+  // get saved sim card entries
+  getSimEjectionEntries(): Promise<any[]>
 }
